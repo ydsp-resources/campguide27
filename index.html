@@ -27,8 +27,8 @@ a{color:inherit}
 .c-main{display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:clamp(10px,2.4vh,26px);min-height:0;padding-top:clamp(12px,3.5vh,40px)}.c-main .enter{margin-top:clamp(14px,3.4vh,38px)}
 .c-main h1{font-family:Tektur,sans-serif;font-weight:500;text-transform:uppercase;line-height:.92;color:#F2F4F8}
 .c-main h1 span{display:block}
-.c-main h1 .a{font-size:clamp(34px,min(5.6vw,10.5vh),93px);letter-spacing:.03em}
-.c-main h1 .b{font-size:clamp(24px,min(3.95vw,7.4vh),65px);letter-spacing:.02em;margin-top:.4vh}
+.c-main h1 .a{font-size:clamp(39px,calc(min(5.6vw,10.5vh) + 5px),98px);letter-spacing:.03em}
+.c-main h1 .b{font-size:clamp(29px,calc(min(3.95vw,7.4vh) + 5px),70px);letter-spacing:.02em;margin-top:.4vh}
 .chips{display:flex;flex-wrap:wrap}
 .chips div{padding:.5em 1.1em;font-family:Silkscreen,monospace;font-size:clamp(.55rem,.9vw + .25rem,.8rem);letter-spacing:.14em;border:1px solid rgba(47,123,255,.5);background:rgba(5,11,26,.78)}
 .chips div+div{border-left:0}
@@ -42,23 +42,23 @@ a{color:inherit}
  .c-art{inset:auto 0 0 0;width:100%;height:50%;background-position:50% 66%}.tag{letter-spacing:.12em;font-size:clamp(.5rem,2.6vw,.8rem)}
  .c-art::before{background:linear-gradient(180deg,var(--bg) 0%,rgba(5,11,26,0) 40%),linear-gradient(0deg,var(--bg) 0%,rgba(5,11,26,.55) 25%,rgba(5,11,26,0) 55%)}
  .c-main{align-items:center;text-align:center}.c-main h1{text-align:center}
- .c-main h1 .a{font-size:clamp(34px,min(14.5vw,9.4vh),64px)}.c-main h1 .b{font-size:clamp(24px,min(10.2vw,6.6vh),45px)}
+ .c-main h1 .a{font-size:clamp(39px,calc(min(14.5vw,9.4vh) + 5px),69px)}.c-main h1 .b{font-size:clamp(29px,calc(min(10.2vw,6.6vh) + 5px),50px)}
 }
-@media (max-height:440px){.tl{display:none}.c-main h1 .a{font-size:min(5.25vw,11.25vh)}.c-main h1 .b{font-size:min(3.7vw,7.9vh)}}
+@media (max-height:440px){.tl{display:none}.c-main h1 .a{font-size:calc(min(5.25vw,11.25vh) + 5px)}.c-main h1 .b{font-size:calc(min(3.7vw,7.9vh) + 5px)}}
 @media (prefers-reduced-motion:reduce){.enter{animation:none}}
 /* SHELL */
 .shell{max-width:1120px;margin:0 auto;padding:clamp(12px,2.6vw,30px)}
 .bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(5,11,26,.94);border:1px solid var(--line);padding:.55rem .7rem;margin-bottom:clamp(14px,3vw,28px);backdrop-filter:blur(6px);font-family:Silkscreen,monospace;letter-spacing:.12em;text-transform:uppercase;font-size:.62rem}
 .bar button,.bot button{border:1px solid var(--blue);padding:.55rem .75rem;letter-spacing:.12em;text-transform:uppercase;font-family:Silkscreen,monospace;font-size:.62rem}
 .bar button:hover,.bot button:hover,.bar button:focus-visible,.bot button:focus-visible{border-color:var(--orange);color:var(--orange);outline:none}
-.bt{color:var(--orange);flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt{font-size:.85rem;color:var(--orange);flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bn{display:flex;gap:6px}
 .bot{display:flex;justify-content:space-between;gap:10px;margin:clamp(22px,4vw,44px) 0 8px}
 .hd{margin-bottom:clamp(16px,3vw,32px)}
-.hd .code{font-family:Silkscreen,monospace;font-size:.7rem;letter-spacing:.16em;color:var(--orange);margin-bottom:.5rem}
+.hd .code{font-family:Silkscreen,monospace;font-size:1rem;letter-spacing:.14em;color:var(--orange);margin-bottom:.5rem}
 .hd h1{font-family:Tektur,sans-serif;font-weight:500;font-size:clamp(1.5rem,2.4vw + .6rem,2.6rem);letter-spacing:.04em;text-transform:uppercase;line-height:1.05}
 .rule{display:flex;align-items:center;margin-top:.9rem}.rule i{display:block;height:1px;background:linear-gradient(90deg,var(--blue),rgba(47,123,255,.1));flex:1}.rule b{width:7px;height:7px;border:1.5px solid var(--blue);border-radius:50%;margin-left:3px}
-.sec{font-family:Silkscreen,monospace;font-size:.68rem;letter-spacing:.14em;margin:0 0 .7rem;display:flex;align-items:center;gap:.6rem;color:var(--blue);text-transform:uppercase}.sec::before{content:"";width:3px;height:.9em;background:var(--orange)}
+.sec{font-family:Silkscreen,monospace;font-size:.85rem;letter-spacing:.14em;margin:0 0 .7rem;display:flex;align-items:center;gap:.6rem;color:var(--blue);text-transform:uppercase}.sec::before{content:"";width:3px;height:.9em;background:var(--orange)}
 .foot{margin-top:2rem;padding-top:.8rem;border-top:1px solid rgba(47,123,255,.2);font-family:Silkscreen,monospace;font-size:.55rem;letter-spacing:.14em;color:var(--muted);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 /* CONTENTS */
 .menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(10px,1.6vw,18px)}
@@ -139,7 +139,7 @@ a{color:inherit}
 .note .ic{color:var(--orange);margin-bottom:1rem}
 .note h1{font-family:Tektur,sans-serif;font-weight:500;font-size:clamp(1.6rem,3vw + .4rem,2.4rem);letter-spacing:.06em;text-transform:uppercase;line-height:1;margin:.4rem 0 1.2rem}
 .note p{font-size:1.1rem;line-height:1.55;color:#E1E9FA}
-.eb{font-family:Silkscreen,monospace;font-size:.68rem;letter-spacing:.18em;color:var(--orange)}
+.eb{font-family:Silkscreen,monospace;font-size:1rem;letter-spacing:.16em;color:var(--orange)}
 .sq .no{white-space:nowrap}.sq .top{flex-wrap:wrap;gap:.2rem .6rem}
 .sqs{grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr))}
 @media (min-width:1000px) and (min-height:520px){
@@ -174,7 +174,7 @@ a{color:inherit}
 @media (min-width:1000px) and (min-height:520px){#v-contents .mi i{display:block;min-height:3.9em}}
 </style></head><body class="on-cover"><main class="view on cover" id="v-cover"><div class="c-art"></div>
 <header class="c-top"><div class="tag"><i></i>YDSP SCIENCE &amp; TECHNOLOGY CAMP<b></b></div></header>
-<div class="c-main"><h1><span class="a">Space</span><span class="b">Robotics</span></h1><div class="tl">BEYOND IMAGINATION, BUILT BY YOU.<br><span class="bl">ARE YOU READY FOR THE MISSION?</span></div><button class="enter" data-go="contents" type="button">ENTER THE MISSION &#9656;</button></div></main><main class="view" id="v-contents"><div class="shell"><div class="bar"><button class="back" data-go="cover" type="button">&#9666; Cover</button><span class="bt">Mission Control</span><span class="bn"></span></div>
+<div class="c-main"><h1><span class="a">Space</span><span class="b">Robotics</span></h1><div class="tl"><span class="l1">BEYOND IMAGINATION, BUILT BY YOU.</span><br><span class="bl">ARE YOU READY FOR THE MISSION?</span></div><button class="enter" data-go="contents" type="button">ENTER THE MISSION &#9656;</button></div></main><main class="view" id="v-contents"><div class="shell"><div class="bar"><button class="back" data-go="cover" type="button">&#9666; Cover</button><span class="bt">Mission Control</span><span class="bn"></span></div>
 <div class="hd"><div class="code">// MISSION CONTROL</div><h1>Choose Your Briefing</h1><div class="rule"><i></i><b></b></div></div><div class="menu"><button class="mi hud" data-go="s1" type="button"><span class="no">01</span><span class="mt"><b>The Mission</b><i>What to expect at camp</i></span><span class="ar">&#9656;</span></button><button class="mi hud" data-go="s2" type="button"><span class="no">02</span><span class="mt"><b>Mission Briefing</b><i>Logistics, attire, daily kit and contacts</i></span><span class="ar">&#9656;</span></button><button class="mi hud" data-go="s3" type="button"><span class="no">03</span><span class="mt"><b>Location Map</b><i>How to get to DSTA</i></span><span class="ar">&#9656;</span></button><button class="mi hud" data-go="s4" type="button"><span class="no">04</span><span class="mt"><b>Camp Programme</b><i>Day-by-day schedule</i></span><span class="ar">&#9656;</span></button><button class="mi hud" data-go="s5" type="button"><span class="no">05</span><span class="mt"><b>Your Squad</b><i>Squad assignments</i></span><span class="ar">&#9656;</span></button><button class="mi hud" data-go="s6" type="button"><span class="no">06</span><span class="mt"><b>The Showcase</b><i>The final operation and commendations</i></span><span class="ar">&#9656;</span></button><button class="mi hud" data-go="s7" type="button"><span class="no">07</span><span class="mt"><b>Notice</b><i>Important information</i></span><span class="ar">&#9656;</span></button></div><div class="foot"><span>YDSP S&amp;T CAMP 2026 // SPACE ROBOTICS</span><span>CONTENTS</span></div></div></main><main class="view" id="v-s1"><div class="shell"><div class="bar"><button class="back" type="button">&#9666; Contents</button><span class="bt">01 // The Mission</span><span class="bn"><button class="pv" type="button" aria-label="Previous">&#9666;</button><button class="nx" type="button" aria-label="Next">&#9656;</button></span></div><div class="hd"><div class="code">// 01 &nbsp;THE MISSION</div><h1>The Mission</h1><div class="rule"><i></i><b></b></div></div><div class="mission"><svg class="rings" viewBox="0 0 400 400" fill="none" stroke="#2F7BFF" stroke-width="1"><circle cx="200" cy="200" r="195" stroke-opacity=".18"/><circle cx="200" cy="200" r="150" stroke-opacity=".25" stroke-dasharray="2 6"/><circle cx="200" cy="200" r="105" stroke-opacity=".35"/><circle cx="200" cy="200" r="60" stroke-opacity=".2"/><ellipse cx="200" cy="200" rx="195" ry="70" transform="rotate(-24 200 200)" stroke="#FF8A1F" stroke-opacity=".5"/><circle cx="332" cy="142" r="3" fill="#2F7BFF" stroke="none"/><path d="M200 5v20M200 375v20M5 200h20M375 200h20" stroke-opacity=".5"/></svg><div class="big"><p>Over five days, you and your team will <em>engineer a prototype</em> for missions that go beyond our earth.</p><p>Along the way, you will get a glimpse into real-world defence situations and see the technology that tackles them.</p></div><div class="sig"><i></i>STAND BY FOR DEPLOYMENT</div></div><div class="foot"><span>YDSP S&amp;T CAMP 2026 // SPACE ROBOTICS</span><span>01 / 07</span></div></div></main><main class="view" id="v-s2"><div class="shell"><div class="bar"><button class="back" type="button">&#9666; Contents</button><span class="bt">02 // Mission Briefing</span><span class="bn"><button class="pv" type="button" aria-label="Previous">&#9666;</button><button class="nx" type="button" aria-label="Next">&#9656;</button></span></div><div class="hd"><div class="code">// 02 &nbsp;MISSION BRIEFING</div><h1>Mission Briefing</h1><div class="rule"><i></i><b></b></div></div><div class="sec">Deployment logistics</div>
 <div class="hud g3"><div class="cell"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div class="lab">Location</div><div class="val">Defence Science &amp; Technology Agency</div><div class="sub">1 Depot Road, S109679</div></div>
 <div class="cell"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/></svg><div class="lab">Date</div><div class="val">30 Nov – 4 Dec 2026</div><div class="sub">Monday to Friday</div></div>
@@ -206,7 +206,25 @@ function show(id){
   v.querySelectorAll('.bar .nx').forEach(function(b){b.title=n<N?label(n+1):'Contents'});
   }
  window.scrollTo(0,0);
+ if(id==='cover')fitTitle();
 }
+
+/* align the tagline so the word YOU ends where ROBOTICS ends */
+function fitTitle(){
+ var tl=document.querySelector('.c-main .tl');if(!tl||!tl.offsetParent)return;
+ var l1=tl.querySelector('.l1'),t=l1.firstChild,h=document.querySelector('.c-main h1 .b');
+ var hs=getComputedStyle(h),hls=parseFloat(hs.letterSpacing)||0;
+ var r=document.createRange();r.selectNodeContents(h);var hr=r.getBoundingClientRect();var W=hr.width-hls;
+ tl.style.fontSize='';tl.style.letterSpacing='0px';
+ var m=t.textContent.length-1;var rr=document.createRange();rr.setStart(t,0);rr.setEnd(t,m);
+ var w0=rr.getBoundingClientRect().width;
+ if(W<w0){tl.style.fontSize=(parseFloat(getComputedStyle(tl).fontSize)*W/w0)+'px';tl.style.letterSpacing='0px';}
+ else{tl.style.letterSpacing=((W-w0)/(m-1))+'px';}
+ tl.style.transform='';
+ if(hs.textAlign==='center'){var ls=parseFloat(getComputedStyle(tl).letterSpacing)||0;var rr2=document.createRange();rr2.setStart(t,0);rr2.setEnd(t,m);var u=rr2.getBoundingClientRect().right-ls;var fl=document.createRange();fl.selectNodeContents(l1);var f=fl.getBoundingClientRect().right;tl.style.transform='translateX('+((f-u)/2)+'px)';}
+}
+addEventListener('resize',fitTitle);addEventListener('load',fitTitle);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitTitle);
 function go(id){ if(location.hash.slice(1)===id)show(id); else location.hash=id }
 function prev(){var n=secOf(cur);go(n>1?'s'+(n-1):'contents')}
 function next(){var n=secOf(cur);go(n&&n<N?'s'+(n+1):'contents')}
