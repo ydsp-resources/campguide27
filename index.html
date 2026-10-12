@@ -27,8 +27,8 @@ a{color:inherit}
 .c-main{display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:clamp(10px,2.4vh,26px);min-height:0;padding-top:clamp(12px,3.5vh,40px)}.c-main .enter{margin-top:clamp(14px,3.4vh,38px)}
 .c-main h1{font-family:Tektur,sans-serif;font-weight:500;text-transform:uppercase;line-height:.92;color:#F2F4F8}
 .c-main h1 span{display:block}
-.c-main h1 .a{font-size:clamp(39px,calc(min(5.6vw,10.5vh) + 5px),98px);letter-spacing:.03em}
-.c-main h1 .b{font-size:clamp(29px,calc(min(3.95vw,7.4vh) + 5px),70px);letter-spacing:.02em;margin-top:.4vh}
+.c-main h1 .a{font-size:clamp(49px,calc(min(5.6vw,10.5vh) + 15px),108px);letter-spacing:.03em}
+.c-main h1 .b{font-size:clamp(39px,calc(min(3.95vw,7.4vh) + 15px),80px);letter-spacing:.02em;margin-top:.4vh}
 .chips{display:flex;flex-wrap:wrap}
 .chips div{padding:.5em 1.1em;font-family:Silkscreen,monospace;font-size:clamp(.55rem,.9vw + .25rem,.8rem);letter-spacing:.14em;border:1px solid rgba(47,123,255,.5);background:rgba(5,11,26,.78)}
 .chips div+div{border-left:0}
@@ -36,15 +36,15 @@ a{color:inherit}
 .enter{font-family:Tektur,sans-serif;font-weight:500;font-size:clamp(10.5px,.35vw + 8px,12.5px);letter-spacing:.12em;color:var(--orange);background:rgba(5,11,26,.7);border:1.5px solid var(--orange);padding:.7em 1.3em;white-space:nowrap;animation:blink 3.2s ease-in-out infinite;transition:background .2s,color .2s}
 .enter:hover,.enter:focus-visible{background:var(--orange);color:#050B1A;animation:none;outline:none}
 @keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,138,31,.25)}50%{opacity:.4;box-shadow:0 0 0 .5rem rgba(255,138,31,0)}}
-.tl{font-size:clamp(.62rem,.9vw + .3rem,.95rem);letter-spacing:.22em;line-height:1.7}
+.tl{font-size:calc(clamp(.62rem,.9vw + .3rem,.95rem) + 10px);letter-spacing:.22em;line-height:1.5}
 .tl .bl{color:var(--blue)}
 @media (max-aspect-ratio:1/1){
  .c-art{inset:auto 0 0 0;width:100%;height:50%;background-position:50% 66%}.tag{letter-spacing:.12em;font-size:clamp(.5rem,2.6vw,.8rem)}
  .c-art::before{background:linear-gradient(180deg,var(--bg) 0%,rgba(5,11,26,0) 40%),linear-gradient(0deg,var(--bg) 0%,rgba(5,11,26,.55) 25%,rgba(5,11,26,0) 55%)}
  .c-main{align-items:center;text-align:center}.c-main h1{text-align:center}
- .c-main h1 .a{font-size:clamp(39px,calc(min(14.5vw,9.4vh) + 5px),69px)}.c-main h1 .b{font-size:clamp(29px,calc(min(10.2vw,6.6vh) + 5px),50px)}
+ .c-main h1 .a{font-size:clamp(49px,calc(min(14.5vw,9.4vh) + 15px),79px)}.c-main h1 .b{font-size:clamp(39px,calc(min(10.2vw,6.6vh) + 15px),60px)}
 }
-@media (max-height:440px){.tl{display:none}.c-main h1 .a{font-size:calc(min(5.25vw,11.25vh) + 5px)}.c-main h1 .b{font-size:calc(min(3.7vw,7.9vh) + 5px)}}
+@media (max-height:440px){.tl{display:none}.c-main h1 .a{font-size:calc(min(5.25vw,11.25vh) + 15px)}.c-main h1 .b{font-size:calc(min(3.7vw,7.9vh) + 15px)}}
 @media (prefers-reduced-motion:reduce){.enter{animation:none}}
 /* SHELL */
 .shell{max-width:1120px;margin:0 auto;padding:clamp(12px,2.6vw,30px)}
@@ -212,16 +212,24 @@ function show(id){
 /* align the tagline so the word YOU ends where ROBOTICS ends */
 function fitTitle(){
  var tl=document.querySelector('.c-main .tl');if(!tl||!tl.offsetParent)return;
- var l1=tl.querySelector('.l1'),t=l1.firstChild,h=document.querySelector('.c-main h1 .b');
- var hs=getComputedStyle(h),hls=parseFloat(hs.letterSpacing)||0;
- var r=document.createRange();r.selectNodeContents(h);var hr=r.getBoundingClientRect();var W=hr.width-hls;
- tl.style.fontSize='';tl.style.letterSpacing='0px';
- var m=t.textContent.length-1;var rr=document.createRange();rr.setStart(t,0);rr.setEnd(t,m);
- var w0=rr.getBoundingClientRect().width;
- if(W<w0){tl.style.fontSize=(parseFloat(getComputedStyle(tl).fontSize)*W/w0)+'px';tl.style.letterSpacing='0px';}
- else{tl.style.letterSpacing=((W-w0)/(m-1))+'px';}
- tl.style.transform='';
- if(hs.textAlign==='center'){var ls=parseFloat(getComputedStyle(tl).letterSpacing)||0;var rr2=document.createRange();rr2.setStart(t,0);rr2.setEnd(t,m);var u=rr2.getBoundingClientRect().right-ls;var fl=document.createRange();fl.selectNodeContents(l1);var f=fl.getBoundingClientRect().right;tl.style.transform='translateX('+((f-u)/2)+'px)';}
+ var l1=tl.querySelector('.l1'),t=l1.firstChild,hb=document.querySelector('.c-main h1 .b'),ha=document.querySelector('.c-main h1 .a');
+ ha.style.letterSpacing='';hb.style.letterSpacing='';ha.style.transform='';hb.style.transform='';tl.style.fontSize='';tl.style.letterSpacing='';tl.style.transform='';
+ var main=tl.parentNode,mcs=getComputedStyle(main);
+ var avail=main.clientWidth-parseFloat(mcs.paddingLeft)-parseFloat(mcs.paddingRight);
+ var m=t.textContent.length-1;
+ function glyphW(){tl.style.letterSpacing='0px';var rr=document.createRange();rr.setStart(t,0);rr.setEnd(t,m);return rr.getBoundingClientRect().width;}
+ var fs=parseFloat(getComputedStyle(tl).fontSize),g0=glyphW();
+ var hbs=getComputedStyle(hb),hls=parseFloat(hbs.letterSpacing)||0,hfs=parseFloat(hbs.fontSize);
+ var r=document.createRange();r.selectNodeContents(hb);var Wt=r.getBoundingClientRect().width-hls;var n=hb.textContent.length;
+ var Wtmax=Math.min(Wt+(n-1)*.12*hfs,avail);
+ var Wgmin=g0+.01*fs*(m-1);
+ if(Wgmin>Wtmax){var k=Wtmax/Wgmin;tl.style.fontSize=(fs*k)+'px';fs=fs*k;g0=glyphW();Wgmin=g0+.01*fs*(m-1);}
+ var Wg=Wgmin;
+ if(Wt>=Wg){tl.style.letterSpacing=((Wt-g0)/(m-1))+'px';}
+ else{var newLs=hls+(Wg-Wt)/(n-1);hb.style.letterSpacing=newLs+'px';ha.style.letterSpacing=(newLs/hfs*parseFloat(getComputedStyle(ha).fontSize))+'px';tl.style.letterSpacing=(.01*fs)+'px';}
+ if(getComputedStyle(hb).textAlign==='center'){
+  [ha,hb].forEach(function(e){var l=parseFloat(getComputedStyle(e).letterSpacing)||0;e.style.transform='translateX('+(l/2)+'px)';});
+  var ls=parseFloat(getComputedStyle(tl).letterSpacing)||0;var r2=document.createRange();r2.setStart(t,0);r2.setEnd(t,m);var u=r2.getBoundingClientRect().right-ls;var fl=document.createRange();fl.selectNodeContents(l1);var f=fl.getBoundingClientRect().right;tl.style.transform='translateX('+((f-u)/2)+'px)';}
 }
 addEventListener('resize',fitTitle);addEventListener('load',fitTitle);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitTitle);
