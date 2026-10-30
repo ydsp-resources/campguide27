@@ -252,6 +252,9 @@ body.touch #whelp{display:none}
 #wfr .sub{color:var(--muted);font-size:14px;margin-bottom:12px}
 #wfr input{width:100%;padding:10px;font:inherit;font-size:22px;letter-spacing:.25em;text-align:center;text-transform:uppercase;border:1px solid #1257E0;background:#fff;color:#0B1E45}
 #wfmsg{min-height:1.3em;margin:10px 0 0;color:#8C3A00}
+
+#wquit{position:absolute;z-index:8;right:10px;top:48px;font-family:Silkscreen,monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#FF8A1F;background:rgba(5,11,26,.92);border:1px solid #FF8A1F;padding:10px 14px;cursor:pointer}
+#wquit:hover{background:#FF8A1F;color:#050B1A}#wquit[hidden]{display:none}
 </style></head><body class="on-cover"><main class="view on cover" id="v-cover"><div class="c-art"></div>
 <header class="c-top"><div class="tag"><i></i>YDSP SCIENCE &amp; TECHNOLOGY CAMP<b></b></div></header>
 <div class="c-main"><h1><span class="a">Space</span><span class="b">Robotics</span></h1><div class="tl"><span class="l1">BEYOND IMAGINATION, BUILT BY YOU.</span><br><span class="bl">ARE YOU READY FOR THE MISSION?</span></div><button class="enter" data-go="contents" type="button">ENTER THE MISSION &#9656;</button></div></main><main class="view" id="v-contents"><div class="shell"><div class="bar"><button class="back" data-go="cover" type="button">&#9666; Cover</button><span class="bt">Mission Control</span><span class="bn"></span></div>
@@ -278,7 +281,7 @@ body.touch #whelp{display:none}
 <div id="wprompt" hidden><button id="wact" type="button"></button></div>
 <div id="wtouch"><div id="wjoy"><i></i></div><button id="wboost" type="button">BOOST</button></div>
 <div id="wlab" class="hud" hidden><h2>Avatar Lab</h2><div class="sub">Customise your avatar. Others in the world will see it.</div><div class="labgrid"><canvas id="wprev" width="300" height="340"></canvas><div id="wlabrows"></div></div><div class="wbtns"><button class="wb" id="wsave" type="button">Save &amp; explore</button></div></div>
-<div id="wfr" class="hud" hidden><h2>Play with friends</h2><div class="sub">Make a code and share it. Everyone who types the same code on their own device joins the same private room and sees each other's avatars.</div><input id="wfcode" maxlength="8" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><div class="wbtns"><button class="wb" id="wfjoin" type="button">Join room</button><button class="wb alt" id="wfnew" type="button">Make a code</button></div><div class="wbtns"><button class="wb alt" id="wfleave" type="button">Back to everyone</button><button class="wb alt" id="wfclose" type="button">Close</button></div><div class="sub" id="wfmsg"></div></div>
+<button id="wquit" type="button" hidden>&#10005; Quit game</button><div id="wfr" class="hud" hidden><h2>Play with friends</h2><div class="sub">Make a code and share it. Everyone who types the same code on their own device joins the same private room and sees each other's avatars.</div><input id="wfcode" maxlength="8" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><div class="wbtns"><button class="wb" id="wfjoin" type="button">Join room</button><button class="wb alt" id="wfnew" type="button">Make a code</button></div><div class="wbtns"><button class="wb alt" id="wfleave" type="button">Back to everyone</button><button class="wb alt" id="wfclose" type="button">Close</button></div><div class="sub" id="wfmsg"></div></div>
 <div id="wover" class="hud" hidden><h2 id="wot"></h2><div class="sub" id="wos"></div><div id="wol"></div><div class="wbtns"><button class="wb" id="wagain" type="button">Play again</button><button class="wb alt" id="wbase" type="button">Back to base</button></div></div>
 </div></main>
 <script>
@@ -459,16 +462,17 @@ var over=$('wover');
 function showOver(title,sub,lines,key,score){var b=best[key];if(score>b){best[key]=score;safeSet('ydsp_best_'+key,score)}
  $('wot').textContent=title;$('wos').textContent=sub;var L=$('wol');L.innerHTML='';var big=document.createElement('div');big.className='big';big.textContent=score;L.appendChild(big);
  lines.concat(['Best: '+best[key]+(score>b?'  (new best!)':'')]).forEach(function(t){var d=document.createElement('div');d.className='ln';d.textContent=t;L.appendChild(d)});over.hidden=false;paused=true;$('wprompt').hidden=true}
-function toHub(){over.hidden=true;paused=false;mode='hub';sample=null;dock=null;P.x=1200;P.y=920;keys={};sendPresence(true)}
+function toHub(){$('wquit').hidden=true;over.hidden=true;paused=false;mode='hub';sample=null;dock=null;P.x=1200;P.y=920;keys={};sendPresence(true)}
 $('wbase').addEventListener('click',toHub);
 $('wagain').addEventListener('click',function(){over.hidden=true;paused=false;var m=mode;if(m==='sample')startSample();else if(m==='dock')startDock()});
-function startSample(){mode='sample';paused=false;over.hidden=true;P.x=1200;P.y=900;sample={t:45,score:0,items:[],drones:[],flash:0,streak:0,combo:0,end:false};
+$('wquit').addEventListener('click',function(){if(mode!=='hub')toHub()});addEventListener('keydown',function(e){if(e.key==='Escape'&&active&&mode!=='hub')toHub()});
+function startSample(){$('wquit').hidden=false;mode='sample';paused=false;over.hidden=true;P.x=1200;P.y=900;sample={t:45,score:0,items:[],drones:[],flash:0,streak:0,combo:0,end:false};
  for(var i=0;i<10;i++)sample.items.push(spawnItem());
  for(var j=0;j<3;j++)sample.drones.push({x:200+Math.random()*(WW-400),y:200+Math.random()*(WH-400),tx:0,ty:0,a:Math.random()*TAU,wait:0});
  sample.drones.forEach(pickWay);sendPresence(true)}
 function spawnItem(){for(var k=0;k<20;k++){var x=120+Math.random()*(WW-240),y=120+Math.random()*(WH-240);if(Math.hypot(x-DOME.x,y-DOME.y)>DOME.r+40&&Math.hypot(x-P.x,y-P.y)>120)return {x:x,y:y,ph:Math.random()*TAU}}return {x:300,y:300,ph:0}}
 function pickWay(d){d.tx=120+Math.random()*(WW-240);d.ty=120+Math.random()*(WH-240)}
-function startDock(){mode='dock';paused=false;over.hidden=true;dock={x:300,y:640,vx:0,rings:[],rocks:[],speed:210,score:0,lives:3,inv:0,streak:0,spawnT:.6,passed:0,msg:'',msgT:0,tilt:0,star:0,over:false};sendPresence(true)}
+function startDock(){$('wquit').hidden=false;mode='dock';paused=false;over.hidden=true;dock={x:300,y:640,vx:0,rings:[],rocks:[],speed:210,score:0,lives:3,inv:0,streak:0,spawnT:.6,passed:0,msg:'',msgT:0,tilt:0,star:0,over:false};sendPresence(true)}
 function updateSample(dt){var s=sample;s.t-=dt;s.flash=Math.max(0,s.flash-dt);
  s.items.forEach(function(it,i){if(Math.hypot(it.x-P.x,it.y-P.y)<34){s.score++;s.streak++;s.items[i]=spawnItem()}});
  s.drones.forEach(function(d){var dx=d.tx-d.x,dy=d.ty-d.y,m=Math.hypot(dx,dy);if(m<10)pickWay(d);else{var sp=95+s.score*3;d.x+=dx/m*sp*dt;d.y+=dy/m*sp*dt}d.a+=dt*16;
@@ -550,8 +554,10 @@ function drawDock(d){var W=view$.w,Hh=view$.h,fw=600,fh=800,s=Math.min(W/fw,Hh/f
 /* ---------- peer-to-peer friend rooms (used when the page is NOT on Claude: e.g. GitHub Pages) ---------- */
 function p2pLobby(){return{p2p:true,presence:function(){return Promise.resolve()},join:p2pJoin}}
 function p2pJoin(name){return new Promise(function(resolve,reject){
- if(!window.Peer){reject({code:'upstream_error'});return}
- var rid='ydsp-'+name,self='u'+Math.random().toString(36).slice(2,9),pres={},hs=[],peer=null,conns={},hc=null,closed=false,ready=false,tm=null,pend=false,mine={};
+ var st=function(t){try{window.__p2pStatus&&window.__p2pStatus(t)}catch(e){}};
+ if(!window.Peer){reject({code:'service',detail:'the PeerJS library did not load'});return}
+ var CFG={debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'},{urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'},{urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}]}};
+ var rid='ydsp-'+name,self='u'+Math.random().toString(36).slice(2,9),pres={},hs=[],peer=null,conns={},hc=null,closed=false,ready=false,tm=null,pend=false,stage='broker',errs=[];
  pres[self]={};
  function emit(){var list=Object.keys(pres).map(function(k){return{peer:k,by:null,isMe:k===self,sameTab:false,kind:'viewer',guest:false,updatedAt:Date.now(),presence:pres[k]}});hs.slice().forEach(function(h){try{h({peers:list,joined:[],left:[],updated:[]})}catch(e){}})}
  function bc(){pend=false;var m={t:'s',all:pres};Object.keys(conns).forEach(function(k){try{conns[k].open&&conns[k].send(m)}catch(e){}});emit()}
@@ -559,22 +565,25 @@ function p2pJoin(name){return new Promise(function(resolve,reject){
  function reset(){try{peer&&peer.destroy()}catch(e){}peer=null;conns={};hc=null;var m=pres[self];pres={};pres[self]=m}
  function retry(){if(closed)return;reset();emit();setTimeout(start,400+Math.random()*900)}
  function ok(){if(!ready){ready=true;clearTimeout(tm);resolve(api)}}
- function start(){if(closed)return;var P;try{P=new window.Peer(rid,{config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}})}catch(e){if(!ready){reject({code:'upstream_error'})}return}peer=P;
-  P.on('open',function(){ /* we are the host */ ok();emit();
+ function fail(code){if(ready||closed)return;closed=true;clearTimeout(tm);var ice='';try{ice=hc&&hc.peerConnection?hc.peerConnection.iceConnectionState:''}catch(e){}try{peer&&peer.destroy()}catch(e){}reject({code:code,detail:'step: '+stage+(errs.length?', errors: '+errs.slice(-3).join('/'):'')+(ice?', link: '+ice:'')})}
+ function start(){if(closed)return;st(ready?'Reconnecting...':'Connecting to the matchmaking service...');stage='broker';var P;try{P=new window.Peer(rid,CFG)}catch(e){errs.push('init');fail('service');return}peer=P;
+  P.on('open',function(){stage='host';ok();emit();
    P.on('connection',function(c){conns[c.peer]=c;c.on('data',function(m){if(m&&m.t==='p'&&m.id&&m.p){c.__id=m.id;pres[m.id]=m.p;sched()}});c.on('close',function(){if(c.__id)delete pres[c.__id];delete conns[c.peer];sched()});c.on('error',function(){})})});
-  P.on('error',function(err){if(closed)return;var t=err&&err.type;
-   if(t==='unavailable-id'){ /* room exists: join it as a guest */ try{P.destroy()}catch(e){}var G=new window.Peer(undefined,{config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}});peer=G;
+  P.on('disconnected',function(){if(!closed){try{P.reconnect()}catch(e){}}});
+  P.on('error',function(err){if(closed)return;var t=(err&&err.type)||'error';errs.push(t);
+   if(t==='unavailable-id'){stage='guest';st('Room found. Connecting to your friend...');try{P.destroy()}catch(e){}var G=new window.Peer(undefined,CFG);peer=G;
      G.on('open',function(){hc=G.connect(rid,{reliable:true});
       hc.on('open',function(){ok();hc.send({t:'p',id:self,p:pres[self]})});
       hc.on('data',function(m){if(m&&m.t==='s'&&m.all){var me=pres[self];pres=m.all;pres[self]=me;emit()}});
-      hc.on('close',retry);hc.on('error',retry)});
-     G.on('error',function(){retry()})}
-   else if(!ready&&(t==='network'||t==='server-error'||t==='socket-error'||t==='socket-closed'||t==='browser-incompatible')){reject({code:'upstream_error'})}
-   else retry()})}
+      hc.on('close',retry);hc.on('error',function(e){errs.push((e&&e.type)||'conn');retry()})});
+     G.on('disconnected',function(){if(!closed){try{G.reconnect()}catch(e){}}});
+     G.on('error',function(e){errs.push((e&&e.type)||'guest');if(!ready)return;retry()})}
+   else if(!ready&&(t==='network'||t==='server-error'||t==='socket-error'||t==='socket-closed'||t==='browser-incompatible'||t==='ssl-unavailable'||t==='invalid-id'||t==='invalid-key')){fail('service')}
+   else if(ready)retry()})}
  var api={name:name,presence:function(p){pres[self]=Object.assign({},pres[self],p);if(hc&&hc.open){try{hc.send({t:'p',id:self,p:pres[self]})}catch(e){}}else if(peer&&!hc)sched();return Promise.resolve()},
   onPeers:function(h){hs.push(h);setTimeout(emit,20);return function(){hs=hs.filter(function(x){return x!==h})}},
-  peers:function(){return[]},connected:function(){return ready},leave:function(){closed=true;hs=[];try{peer&&peer.destroy()}catch(e){}return Promise.resolve()}};
- tm=setTimeout(function(){if(!ready){closed=true;try{peer&&peer.destroy()}catch(e){}reject({code:'upstream_error'})}},12000);
+  peers:function(){return[]},connected:function(){return ready},leave:function(){closed=true;hs=[];clearTimeout(tm);try{peer&&peer.destroy()}catch(e){}return Promise.resolve()}};
+ tm=setTimeout(function(){fail(stage==='guest'?'direct':'service')},25000);
  start()})}
 var room=null,base=null,named=null,rcode='',unsub=null,peers=[],pos={},sentAt=0,lastSent='';
 var net=$('wnet');
@@ -584,13 +593,13 @@ function initRoom(){if(base!==null)return;if(!window.claude||!window.claude.use)
 function netUpdate(){if(!room){net.textContent='Solo';net.className='wpill';return}var n=0;peers.forEach(function(p){if(p.kind==='viewer'&&!p.isMe)n++});net.textContent=(rcode?'Friends '+rcode.toUpperCase():'Live')+' \u00b7 '+(n+1)+' online';net.className='wpill live'}
 /* play with friends: private room by code */
 var fr=$('wfr'),fm=$('wfmsg'),fi=$('wfcode');
-function frMsg(t){fm.textContent=t||''}
+function frMsg(t){fm.textContent=t||''}window.__p2pStatus=frMsg;
 function frOpen(){if(mode!=='hub'||labOpen)return;fr.hidden=false;fi.value=rcode.toUpperCase();frMsg(base?(rcode?'You are in room '+rcode.toUpperCase()+'.':''):'Friend rooms need a live connection, which is not available on this link. You are playing solo.');if(base)fi.focus()}
 function frClose(){fr.hidden=true;fi.blur()}
 function frJoin(){var c=(fi.value||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(!base){frMsg('Friend rooms are not available on this link.');return}if(c.length<3||c.length>8){frMsg('Use a code of 3 to 8 letters or numbers.');return}
- frMsg('Joining...');base.join('friends-'+c).then(function(nr){var old=named;if(old&&old!==nr){try{old.leave()}catch(e){}}
+ window.__p2pStatus=frMsg;frMsg('Connecting... this can take up to 25 seconds.');base.join('friends-'+c).then(function(nr){var old=named;if(old&&old!==nr){try{old.leave()}catch(e){}}
   if(!rcode){try{base.presence({x:null,y:null,a:null,m:null,f:null,v:null}).catch(function(){})}catch(e){}}
-  named=nr;rcode=c;attach(nr);fi.value=c.toUpperCase();frMsg('Joined room '+c.toUpperCase()+'. Friends who type the same code will appear here.')}).catch(function(e){frMsg(e&&e.code==='not_permitted'?'Private rooms are not available for your account here.':(e&&e.code==='upstream_error'?'Could not reach the connection service. Check your internet, or try a different network (school or office Wi-Fi can block it).':'Could not join. Please try again.'))})}
+  named=nr;rcode=c;attach(nr);fi.value=c.toUpperCase();frMsg('Joined room '+c.toUpperCase()+'. Friends who type the same code will appear here.')}).catch(function(e){frMsg(e&&e.code==='not_permitted'?'Private rooms are not available for your account here.':(e&&e.code==='service'?'Could not reach the matchmaking service. Your network or browser may be blocking it. Try mobile data or another Wi-Fi. ['+(e.detail||'')+']':(e&&e.code==='direct'?'Found the room, but your two devices could not connect to each other. This often happens when they are on different networks (for example one on mobile data) or on a school or office network. Try both devices on the same Wi-Fi. ['+(e.detail||'')+']':'Could not join. Please try again. ['+((e&&(e.detail||e.code))||'')+']')))})}
 function frLeave(){if(named){try{named.leave()}catch(e){}}named=null;rcode='';if(base)attach(base);fi.value='';frMsg('Back with everyone.')}
 $('wfrbtn').addEventListener('click',frOpen);$('wfclose').addEventListener('click',frClose);$('wfjoin').addEventListener('click',frJoin);$('wfleave').addEventListener('click',frLeave);
 $('wfnew').addEventListener('click',function(){var ch='abcdefghjkmnpqrstuvwxyz23456789',s='';for(var k=0;k<5;k++)s+=ch[Math.floor(Math.random()*ch.length)];fi.value=s.toUpperCase();frMsg('Share this code with your friends, then press Join room.')});
@@ -603,7 +612,7 @@ function peerList(){var out=[],seen={};peers.forEach(function(p){if(p.isMe||p.ki
 /* ---------- loop ---------- */
 function frame(ts){if(!active)return;var dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);draw();sendPresence(false);raf=requestAnimationFrame(frame)}
 window.__worldShow=function(on){if(on){if(active)return;active=true;resize();initRoom();if(!hasSaved&&!labOpen)openLab();last=performance.now();raf=requestAnimationFrame(frame)}
- else{active=false;cancelAnimationFrame(raf);keys={};joy.x=joy.y=0;if(mode!=='hub'){over.hidden=true;paused=false;mode='hub';sample=null;dock=null;P.x=1200;P.y=920}sendPresence(true)}};
+ else{active=false;cancelAnimationFrame(raf);keys={};joy.x=joy.y=0;if(mode!=='hub'){$('wquit').hidden=true;over.hidden=true;paused=false;mode='hub';sample=null;dock=null;P.x=1200;P.y=920}sendPresence(true)}};
 window.__world={get mode(){return mode},get av(){return av},get P(){return P},get sample(){return sample},get dock(){return dock},get paused(){return paused},get peers(){return peerList()},get labOpen(){return labOpen},WW:WW,WH:WH,PADS:PADS,get room(){return room}};
 })();
 </script><script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js" async></script></body></html>
