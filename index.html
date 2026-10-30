@@ -283,7 +283,7 @@ body.touch #whelp{display:none}
 <div id="wprompt" hidden><button id="wact" type="button"></button></div>
 <div id="wtouch"><div id="wjoy"><i></i></div><button id="wboost" type="button">BOOST</button></div>
 <div id="wlab" class="hud" hidden><h2>Avatar Lab</h2><div class="sub">Customise your avatar. Others in the world will see it.</div><div class="labgrid"><canvas id="wprev" width="300" height="340"></canvas><div id="wlabrows"></div></div><div class="wbtns"><button class="wb" id="wsave" type="button">Save &amp; explore</button></div></div>
-<div id="wcount" hidden></div><button id="wquit" type="button" hidden>&#10005; Quit game</button><div id="wfr" class="hud" hidden><h2>Play with friends</h2><div class="sub">Make a code and share it. Everyone who types the same code on their own device joins the same private room and sees each other's avatars. Tip: joining works best when everyone is on the same network, for example all on mobile data.</div><input id="wfcode" maxlength="8" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><div class="wbtns"><button class="wb" id="wfjoin" type="button">Join room</button><button class="wb alt" id="wfnew" type="button">Make a code</button></div><div class="wbtns"><button class="wb alt" id="wfleave" type="button">Back to everyone</button><button class="wb alt" id="wfclose" type="button">Close</button></div><div class="sub" id="wfmsg"></div></div>
+<div id="wcount" hidden></div><button id="wquit" type="button" hidden>&#10005; Quit game</button><div id="wfr" class="hud" hidden><h2>Play with friends</h2><div class="sub">Everyone who opens the virtual world is already in one shared world. Use a code only if you want a private room: everyone who types the same code joins that room.</div><input id="wfcode" maxlength="8" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><div class="wbtns"><button class="wb" id="wfjoin" type="button">Join room</button><button class="wb alt" id="wfnew" type="button">Make a code</button></div><div class="wbtns"><button class="wb alt" id="wfleave" type="button">Back to everyone</button><button class="wb alt" id="wfclose" type="button">Close</button></div><div class="sub" id="wfmsg"></div></div>
 <div id="wover" class="hud" hidden><h2 id="wot"></h2><div class="sub" id="wos"></div><div id="wol"></div><div class="wbtns"><button class="wb" id="wagain" type="button">Play again</button><button class="wb alt" id="wbase" type="button">Back to base</button></div></div>
 </div></main>
 <script>
@@ -475,13 +475,13 @@ function toHub(){rnd=Math.random;cancelStart();$('wquit').hidden=true;over.hidde
 $('wbase').addEventListener('click',toHub);
 $('wagain').addEventListener('click',function(){over.hidden=true;paused=false;var m=mode;rnd=Math.random;if(m==='sample')startSample();else if(m==='dock')startDock()});
 $('wquit').addEventListener('click',function(){if(mode!=='hub')toHub()});addEventListener('keydown',function(e){if(e.key==='Escape'&&active&&mode!=='hub')toHub()});
-function startSample(){$('wquit').hidden=false;mode='sample';paused=false;over.hidden=true;P.x=1200;P.y=900;sample={t:45,score:0,items:[],drones:[],flash:0,streak:0,combo:0,end:false};
+function startSample(){$('wfr').hidden=true;$('wquit').hidden=false;mode='sample';paused=false;over.hidden=true;P.x=1200+(Math.random()*500-250);P.y=900+(Math.random()*120-60);sample={t:45,score:0,items:[],drones:[],flash:0,streak:0,combo:0,end:false};
  for(var i=0;i<10;i++)sample.items.push(spawnItem());
  for(var j=0;j<3;j++)sample.drones.push({x:200+rnd()*(WW-400),y:200+rnd()*(WH-400),tx:0,ty:0,a:rnd()*TAU,wait:0});
  sample.drones.forEach(pickWay);sendPresence(true)}
 function spawnItem(){for(var k=0;k<20;k++){var x=120+rnd()*(WW-240),y=120+rnd()*(WH-240);if(Math.hypot(x-DOME.x,y-DOME.y)>DOME.r+40&&Math.hypot(x-P.x,y-P.y)>120)return {x:x,y:y,ph:rnd()*TAU}}return {x:300,y:300,ph:0}}
 function pickWay(d){d.tx=120+rnd()*(WW-240);d.ty=120+rnd()*(WH-240)}
-function startDock(){$('wquit').hidden=false;mode='dock';paused=false;over.hidden=true;dock={x:300,y:640,vx:0,rings:[],rocks:[],speed:210,score:0,lives:3,inv:0,streak:0,spawnT:.6,passed:0,msg:'',msgT:0,tilt:0,star:0,over:false};sendPresence(true)}
+function startDock(){$('wfr').hidden=true;$('wquit').hidden=false;mode='dock';paused=false;over.hidden=true;dock={x:300,y:640,vx:0,rings:[],rocks:[],speed:210,score:0,lives:3,inv:0,streak:0,spawnT:.6,passed:0,msg:'',msgT:0,tilt:0,star:0,over:false};sendPresence(true)}
 function updateSample(dt){var s=sample;s.t-=dt;s.flash=Math.max(0,s.flash-dt);
  s.items.forEach(function(it,i){if(Math.hypot(it.x-P.x,it.y-P.y)<34){s.score++;s.streak++;s.items[i]=spawnItem()}});
  s.drones.forEach(function(d){var dx=d.tx-d.x,dy=d.ty-d.y,m=Math.hypot(dx,dy);if(m<10)pickWay(d);else{var sp=95+s.score*3;d.x+=dx/m*sp*dt;d.y+=dy/m*sp*dt}d.a+=dt*16;
@@ -537,7 +537,7 @@ function draw(){var d=view$.dpr,s=view$.s,W=view$.w,Hh=view$.h;
  if(mode==='sample'&&sample)drawSample();
  var ents=[];if(mode==='hub'||mode==='sample'){peerList(mode==='hub'?'h':'s').forEach(function(p){ents.push(p)})}
  ents.push({self:true,x:P.x,y:P.y});ents.sort(function(a,b){return a.y-b.y});
- ents.forEach(function(e){if(e.self){drawAvatar(ctx,P.x,P.y,av,{t:tt,face:P.face,moving:P.moving,boost:P.boost,tag:mode==='hub'?'YOU':null,tagColor:'#FF8A1F',flame:P.boost})}else{drawAvatar(ctx,e.x,e.y,e.av,{t:tt,face:e.face,moving:e.moving,tag:callsign(e.av)})}});
+ ents.forEach(function(e){if(e.self){drawAvatar(ctx,P.x,P.y,av,{t:tt,face:P.face,moving:P.moving,boost:P.boost,tag:(mode==='hub'||mode==='sample')?'YOU':null,tagColor:'#FF8A1F',flame:P.boost})}else{drawAvatar(ctx,e.x,e.y,e.av,{t:tt,face:e.face,moving:e.moving,tag:callsign(e.av)})}});
  if(sample&&sample.flash>0){ctx.setTransform(d,0,0,d,0,0);ctx.fillStyle='rgba(229,72,77,'+(sample.flash*.35)+')';ctx.fillRect(0,0,W,Hh)}}
 function drawBase(){
  ctx.fillStyle='#1E2B55';ctx.beginPath();ctx.arc(DOME.x,DOME.y,DOME.r,0,TAU);ctx.fill();ctx.strokeStyle='#5C86E8';ctx.lineWidth=5;ctx.stroke();
@@ -561,64 +561,66 @@ function drawDock(d){var W=view$.w,Hh=view$.h,fw=600,fh=800,s=Math.min(W/fw,Hh/f
  ctx.strokeStyle='rgba(47,123,255,.6)';ctx.lineWidth=3;ctx.strokeRect(0,0,fw,fh);
  k.rings.forEach(function(r){ctx.save();ctx.strokeStyle=r.ok?'#7CFFB2':(r.done?'#E5484D':'#5ED3F3');ctx.lineWidth=6;ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=14;ctx.beginPath();ctx.ellipse(r.x,r.y,r.r+8,14,0,0,TAU);ctx.stroke();ctx.fillStyle='#8EA0C4';ctx.shadowBlur=0;rr(ctx,r.x-r.r-14,r.y-12,12,24,3);ctx.fill();rr(ctx,r.x+r.r+2,r.y-12,12,24,3);ctx.fill();ctx.restore()});
  k.rocks.forEach(function(q){ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.a);ctx.fillStyle='#6B7799';ctx.beginPath();for(var j=0;j<8;j++){var an=j/8*TAU,rad=q.r*(.8+.25*Math.sin(j*2.3+q.r));ctx.lineTo(Math.cos(an)*rad,Math.sin(an)*rad)}ctx.closePath();ctx.fill();ctx.strokeStyle='#9AA7C8';ctx.lineWidth=2;ctx.stroke();ctx.restore()});
+ peerList('d').forEach(function(e){ctx.save();ctx.globalAlpha=.6;ctx.translate(e.x,e.y);drawAvatar(ctx,0,0,e.av,{t:tt,face:1,moving:false,boost:true,flame:true,scale:1.5,tag:callsign(e.av)});ctx.restore()});
  if(!(k.inv>0&&Math.floor(k.inv*14)%2)){ctx.save();ctx.translate(k.x,k.y);ctx.rotate(k.tilt);drawAvatar(ctx,0,0,av,{t:tt,face:1,moving:false,boost:true,flame:true,scale:1.5,tag:null});ctx.restore()}
  if(k.msgT>0){ctx.fillStyle='rgba(255,255,255,'+Math.min(1,k.msgT*2)+')';ctx.font='bold 26px Tektur,sans-serif';ctx.textAlign='center';ctx.fillText(k.msg,fw/2,200-(.7-k.msgT)*40)}}
 /* ---------- multiplayer (live presence, optional) ---------- */
-/* ---------- peer-to-peer friend rooms (used when the page is NOT on Claude: e.g. GitHub Pages) ---------- */
-function p2pLobby(){return{p2p:true,presence:function(){return Promise.resolve()},join:p2pJoin}}
-function p2pJoin(name){return new Promise(function(resolve,reject){
- var st=function(t){try{window.__p2pStatus&&window.__p2pStatus(t)}catch(e){}};
- if(!window.Peer){reject({code:'service',detail:'the PeerJS library did not load'});return}
- var CFG={debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'},{urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'},{urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}]}};
- var rid='ydsp-'+name,self='u'+Math.random().toString(36).slice(2,9),pres={},hs=[],peer=null,conns={},hc=null,closed=false,ready=false,tm=null,pend=false,stage='broker',errs=[];
- pres[self]={};
- function emit(){var list=Object.keys(pres).map(function(k){return{peer:k,by:null,isMe:k===self,sameTab:false,kind:'viewer',guest:false,updatedAt:Date.now(),presence:pres[k]}});hs.slice().forEach(function(h){try{h({peers:list,joined:[],left:[],updated:[]})}catch(e){}})}
- function bc(){pend=false;var m={t:'s',all:pres};Object.keys(conns).forEach(function(k){try{conns[k].open&&conns[k].send(m)}catch(e){}});emit()}
- function sched(){if(!pend){pend=true;var n=Object.keys(conns).length;setTimeout(bc,Math.max(90,Math.min(500,n*8)))}}
- function reset(){try{peer&&peer.destroy()}catch(e){}peer=null;conns={};hc=null;var m=pres[self];pres={};pres[self]=m}
- function retry(){if(closed)return;reset();emit();setTimeout(start,400+Math.random()*900)}
- function ok(){if(!ready){ready=true;clearTimeout(tm);resolve(api)}}
- function fail(code){if(ready||closed)return;closed=true;clearTimeout(tm);var ice='';try{ice=hc&&hc.peerConnection?hc.peerConnection.iceConnectionState:''}catch(e){}try{peer&&peer.destroy()}catch(e){}reject({code:code,detail:'step: '+stage+(errs.length?', errors: '+errs.slice(-3).join('/'):'')+(ice?', link: '+ice:'')})}
- function start(){if(closed)return;st(ready?'Reconnecting...':'Connecting to the matchmaking service...');stage='broker';var P;try{P=new window.Peer(rid,CFG)}catch(e){errs.push('init');fail('service');return}peer=P;
-  P.on('open',function(){stage='host';ok();emit();
-   P.on('connection',function(c){conns[c.peer]=c;c.on('data',function(m){if(m&&m.t==='p'&&m.id&&m.p){c.__id=m.id;pres[m.id]=m.p;sched()}});c.on('close',function(){if(c.__id)delete pres[c.__id];delete conns[c.peer];sched()});c.on('error',function(){})})});
-  P.on('disconnected',function(){if(!closed){try{P.reconnect()}catch(e){}}});
-  P.on('error',function(err){if(closed)return;var t=(err&&err.type)||'error';errs.push(t);
-   if(t==='unavailable-id'){stage='guest';st('Room found. Connecting to your friend...');try{P.destroy()}catch(e){}var G=new window.Peer(undefined,CFG);peer=G;
-     G.on('open',function(){hc=G.connect(rid,{reliable:true});
-      hc.on('open',function(){ok();hc.send({t:'p',id:self,p:pres[self]})});
-      hc.on('data',function(m){if(m&&m.t==='s'&&m.all){var me=pres[self];pres=m.all;pres[self]=me;emit()}});
-      hc.on('close',retry);hc.on('error',function(e){errs.push((e&&e.type)||'conn');retry()})});
-     G.on('disconnected',function(){if(!closed){try{G.reconnect()}catch(e){}}});
-     G.on('error',function(e){errs.push((e&&e.type)||'guest');if(!ready)return;retry()})}
-   else if(!ready&&(t==='network'||t==='server-error'||t==='socket-error'||t==='socket-closed'||t==='browser-incompatible'||t==='ssl-unavailable'||t==='invalid-id'||t==='invalid-key')){fail('service')}
-   else if(ready)retry()})}
- var api={name:name,presence:function(p){pres[self]=Object.assign({},pres[self],p);if(hc&&hc.open){try{hc.send({t:'p',id:self,p:pres[self]})}catch(e){}}else if(peer&&!hc)sched();return Promise.resolve()},
-  onPeers:function(h){hs.push(h);setTimeout(emit,20);return function(){hs=hs.filter(function(x){return x!==h})}},
-  peers:function(){return[]},connected:function(){return ready},leave:function(){closed=true;hs=[];clearTimeout(tm);try{peer&&peer.destroy()}catch(e){}return Promise.resolve()}};
- tm=setTimeout(function(){fail(stage==='guest'?'direct':'service')},25000);
- start()})}
+/* ---------- shared world over a public relay (MQTT over WebSocket). Used when the page is NOT on Claude. ---------- */
+var MQ=null,MQID='u'+Math.random().toString(36).slice(2,10),MQB=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081'],mqErr='';
+function mqMsg(t,pl){var s=String(t).split('/');if(s[1]==='_gone'){var id=s[2];Object.keys(MQ.rooms).forEach(function(k){MQ.rooms[k].drop(id)});return}
+ var r=MQ.rooms[s[1]];if(r)r.handle(s.slice(2).join('/'),pl)}
+function mqConnect(){if(MQ&&MQ.p)return MQ.p;var st={rooms:{},c:null};MQ=st;var p=new Promise(function(res,rej){
+ if(!window.mqtt){mqErr='the connection library did not load';rej({code:'service',detail:mqErr});return}
+ var i=0;(function next(){if(i>=MQB.length){mqErr='no relay server could be reached';rej({code:'service',detail:mqErr});return}
+  var url=MQB[i++],done=false,c;try{c=window.mqtt.connect(url,{clientId:'ydsp26-'+MQID+'-'+Math.random().toString(36).slice(2,6),clean:true,reconnectPeriod:2500,connectTimeout:7000,keepalive:30,will:{topic:'ydsp26/_gone/'+MQID,payload:'1',qos:0}})}catch(e){next();return}
+  var to=setTimeout(function(){if(!done){done=true;try{c.end(true)}catch(e){}next()}},8500);
+  c.on('error',function(){});
+  c.once('connect',function(){if(done)return;done=true;clearTimeout(to);st.c=c;c.subscribe('ydsp26/_gone/+');c.on('message',mqMsg);
+   c.on('connect',function(){c.subscribe('ydsp26/_gone/+');Object.keys(st.rooms).forEach(function(k){st.rooms[k].resub()})});res(c)})})()});
+ st.p=p;p.catch(function(){if(MQ===st)MQ=null});return p}
+function p2pLobby(){return{p2p:true,presence:function(){return Promise.resolve()},join:mqttJoin}}
+function mqttJoin(name){return mqConnect().then(function(c){if(MQ.rooms[name])return MQ.rooms[name].api;return new Promise(function(resolve){
+ var T='ydsp26/'+name+'/',self=MQID,seen={},hs=[],mine={},last=0,pend=false,closed=false,emT=false;
+ function pub(sub,o){try{c.publish(T+sub,JSON.stringify(o),{qos:0})}catch(e){}}
+ function flush(){last=Date.now();pub('p/'+self,mine)}
+ function sched(){if(pend||closed)return;pend=true;var n=Object.keys(seen).length,gap=Math.max(120,Math.min(1500,n*10));setTimeout(function(){pend=false;if(!closed)flush()},Math.max(0,last+gap-Date.now()))}
+ function emit(){if(emT)return;emT=true;setTimeout(function(){emT=false;var list=[{peer:self,by:null,isMe:true,sameTab:true,kind:'viewer',guest:false,updatedAt:Date.now(),presence:mine}];Object.keys(seen).forEach(function(k){list.push({peer:k,by:null,isMe:false,sameTab:false,kind:'viewer',guest:false,updatedAt:seen[k].t,presence:seen[k].p})});hs.slice().forEach(function(h){try{h({peers:list,joined:[],left:[],updated:[]})}catch(e){}})},60)}
+ function clean(p){if(!p||typeof p!=='object')return null;var o={};['x','y'].forEach(function(k){var v=+p[k];if(isFinite(v)&&Math.abs(v)<1e5)o[k]=v});['m','at'].forEach(function(k){if(typeof p[k]==='string'&&p[k].length<12)o[k]=p[k]});['f','v','gs'].forEach(function(k){var v=+p[k];if(isFinite(v)&&Math.abs(v)<1e7)o[k]=v});if(Array.isArray(p.a)&&p.a.length<12)o.a=p.a.map(function(v){return+v||0});if(p.go&&typeof p.go==='object'&&p.go.id)o.go={id:String(p.go.id).slice(0,40),pad:String(p.go.pad||'').slice(0,12),seed:(+p.go.seed)>>>0};else if(p.go===null)o.go=null;return o}
+ var R={drop:function(id){if(seen[id]){delete seen[id];emit()}},
+  handle:function(sub,pl){var s=sub.split('/');if(s[0]==='hello'){if(s[1]!==self)setTimeout(flush,Math.random()*500);return}
+   if(s[0]!=='p'||!s[1]||s[1]===self)return;var o;try{o=JSON.parse(String(pl))}catch(e){return}if(o&&o.gone){R.drop(s[1]);return}var p=clean(o);if(!p)return;seen[s[1]]={p:p,t:Date.now()};emit()},
+  resub:function(){c.subscribe(T+'#');pub('hello/'+self,{});flush()}};
+ var api={name:name,mq:true,join:mqttJoin,
+  presence:function(p){mine=Object.assign({},mine,p);sched();emit();return Promise.resolve()},
+  onPeers:function(h){hs.push(h);emit();return function(){hs=hs.filter(function(x){return x!==h})}},
+  peers:function(){return[]},connected:function(){return !!(c&&c.connected)},
+  leave:function(){closed=true;clearInterval(hb);clearInterval(gc);pub('p/'+self,{gone:1});try{c.unsubscribe(T+'#')}catch(e){}delete MQ.rooms[name];hs=[];return Promise.resolve()}};
+ R.api=api;MQ.rooms[name]=R;
+ var hb=setInterval(function(){if(!closed)flush()},2000),gc=setInterval(function(){var now=Date.now(),ch=false;Object.keys(seen).forEach(function(k){if(now-seen[k].t>7000){delete seen[k];ch=true}});if(ch)emit()},1500);
+ c.subscribe(T+'#',function(){});pub('hello/'+self,{});flush();resolve(api)})})}
+addEventListener('pagehide',function(){try{if(MQ&&MQ.c)Object.keys(MQ.rooms).forEach(function(k){MQ.rooms[k].api.leave()})}catch(e){}});
 var room=null,base=null,named=null,rcode='',unsub=null,peers=[],pos={},sentAt=0,lastSent='';
 var net=$('wnet');
-function attach(r){if(unsub){try{unsub()}catch(e){}unsub=null}peers=[];pos={};if(r.p2p){room=null;netUpdate();return}room=r;unsub=r.onPeers(function(ch){peers=ch.peers||[];netUpdate()},function(){});netUpdate();sendPresence(true)}
-function initRoom(){if(base!==null)return;if(!window.claude||!window.claude.use){base=p2pLobby();return}base=false;
+function attach(r){if(unsub){try{unsub()}catch(e){}unsub=null}peers=[];pos={};room=r;unsub=r.onPeers(function(ch){peers=ch.peers||[];netUpdate()},function(){});netUpdate();sendPresence(true)}
+function initRoom(){if(base!==null&&!mqFail)return;mqFail=false;base=false;if(!window.claude||!window.claude.use){joinEveryone();return}
  try{window.claude.use('room').then(function(r){if(!r)return;base=r;attach(r)}).catch(function(){})}catch(e){}}
-function netUpdate(){if(!room){net.textContent='Solo';net.className='wpill';return}var n=0;peers.forEach(function(p){if(p.kind==='viewer'&&!p.isMe)n++});net.textContent=(rcode?'Friends '+rcode.toUpperCase():'Live')+' \u00b7 '+(n+1)+' online';net.className='wpill live'}
+var liveTry=0;function joinEveryone(){liveTry++;netUpdate();try{mqttJoin('everyone').then(function(r){base=r;attach(r);netUpdate()}).catch(function(){base=false;mqFail=true;netUpdate()})}catch(e){base=false;mqFail=true;netUpdate()}}var mqFail=false;
+function netUpdate(){if(!room){net.textContent=(window.claude&&window.claude.use)||!base&&!mqFail&&liveTry?(liveTry&&!mqFail?'Connecting...':'Solo'):'Solo';net.className='wpill';return}var n=0;peers.forEach(function(p){if(p.kind==='viewer'&&!p.isMe)n++});net.textContent=(rcode?'Friends '+rcode.toUpperCase():(room&&room.mq?'Everyone':'Live'))+' \u00b7 '+(n+1)+' online';net.className='wpill live'}
 /* play with friends: private room by code */
 var fr=$('wfr'),fm=$('wfmsg'),fi=$('wfcode');
 function frMsg(t){fm.textContent=t||''}window.__p2pStatus=frMsg;
-function frOpen(){if(mode!=='hub'||labOpen)return;fr.hidden=false;fi.value=rcode.toUpperCase();frMsg(base?(rcode?'You are in room '+rcode.toUpperCase()+'.':''):'Friend rooms need a live connection, which is not available on this link. You are playing solo.');if(base)fi.focus()}
+function frOpen(){if(mode!=='hub'||labOpen)return;fr.hidden=false;fi.value=rcode.toUpperCase();frMsg(base?(rcode?'You are in room '+rcode.toUpperCase()+'.':''):(mqFail?'Could not reach the live service, so you are playing solo. Your network may be blocking it; try mobile data or another Wi-Fi, then reload.':'Connecting to the live service... try again in a moment.'));if(base)fi.focus()}
 function frClose(){fr.hidden=true;fi.blur()}
 function frJoin(){var c=(fi.value||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(!base){frMsg('Friend rooms are not available on this link.');return}if(c.length<3||c.length>8){frMsg('Use a code of 3 to 8 letters or numbers.');return}
  window.__p2pStatus=frMsg;frMsg('Connecting... this can take up to 25 seconds.');base.join('friends-'+c).then(function(nr){var old=named;if(old&&old!==nr){try{old.leave()}catch(e){}}
   if(!rcode){try{base.presence({x:null,y:null,a:null,m:null,f:null,v:null}).catch(function(){})}catch(e){}}
-  named=nr;rcode=c;attach(nr);fi.value=c.toUpperCase();frMsg('Joined room '+c.toUpperCase()+'. Friends who type the same code will appear here.')}).catch(function(e){frMsg(e&&e.code==='not_permitted'?'Private rooms are not available for your account here.':(e&&e.code==='service'?'Could not reach the matchmaking service. Your network or browser may be blocking it. Try mobile data or another Wi-Fi. ['+(e.detail||'')+']':(e&&e.code==='direct'?'Found the room, but your two devices could not connect to each other. This often happens when they are on different networks (for example one on mobile data) or on a school or office network. Try both devices on the same Wi-Fi. ['+(e.detail||'')+']':'Could not join. Please try again. ['+((e&&(e.detail||e.code))||'')+']')))})}
+  named=nr;rcode=c;attach(nr);fi.value=c.toUpperCase();frMsg('Joined room '+c.toUpperCase()+'. Friends who type the same code will appear here.');setTimeout(function(){if(rcode===c)frClose()},1600)}).catch(function(e){frMsg(e&&e.code==='not_permitted'?'Private rooms are not available for your account here.':(e&&e.code==='service'?'Could not reach the matchmaking service. Your network or browser may be blocking it. Try mobile data or another Wi-Fi. ['+(e.detail||'')+']':(e&&e.code==='direct'?'Found the room, but your two devices could not connect to each other. This often happens when they are on different networks (for example one on mobile data) or on a school or office network. Try both devices on the same Wi-Fi. ['+(e.detail||'')+']':'Could not join. Please try again. ['+((e&&(e.detail||e.code))||'')+']')))})}
 function frLeave(){if(named){try{named.leave()}catch(e){}}named=null;rcode='';if(base)attach(base);fi.value='';frMsg('Back with everyone.')}
 $('wfrbtn').addEventListener('click',frOpen);$('wfclose').addEventListener('click',frClose);$('wfjoin').addEventListener('click',frJoin);$('wfleave').addEventListener('click',frLeave);
 $('wfnew').addEventListener('click',function(){var ch='abcdefghjkmnpqrstuvwxyz23456789',s='';for(var k=0;k<5;k++)s+=ch[Math.floor(Math.random()*ch.length)];fi.value=s.toUpperCase();frMsg('Share this code with your friends, then press Join room.')});
 fi.addEventListener('keydown',function(e){if(e.key==='Enter')frJoin()});
 function sendPresence(force){if(!room||typeof room.presence!=='function')return;var now=performance.now();if(!force&&now-sentAt<120)return;
- var m=mode==='hub'?'h':(mode==='sample'?'s':'d');var o={x:Math.round(P.x),y:Math.round(P.y),a:avToArr(av),m:m,f:P.face>0?1:-1,v:P.moving?1:0,at:(mode==='hub'&&nearPad&&nearPad.id!=='lab')?nearPad.id:'',go:myGo||null,gs:(mode==='sample'&&sample)?sample.score:((mode==='dock'&&dock)?dock.score:0)};var j=JSON.stringify(o);if(!force&&j===lastSent)return;lastSent=j;sentAt=now;try{room.presence(o).catch(function(){})}catch(e){}}
+ var m=mode==='hub'?'h':(mode==='sample'?'s':'d');var o={x:Math.round(mode==='dock'&&dock?dock.x:P.x),y:Math.round(mode==='dock'&&dock?dock.y:P.y),a:avToArr(av),m:m,f:P.face>0?1:-1,v:P.moving?1:0,at:(mode==='hub'&&nearPad&&nearPad.id!=='lab')?nearPad.id:'',go:myGo||null,gs:(mode==='sample'&&sample)?sample.score:((mode==='dock'&&dock)?dock.score:0)};var j=JSON.stringify(o);if(!force&&j===lastSent)return;lastSent=j;sentAt=now;try{room.presence(o).catch(function(){})}catch(e){}}
 function peerList(want){want=want||'h';var out=[],seen={};peers.forEach(function(p){if(p.isMe||p.kind!=='viewer')return;var pr=p.presence||{};if(pr.m!==want)return;var a=avFromArr(pr.a);if(!a)return;var x=+pr.x,y=+pr.y;if(!isFinite(x)||!isFinite(y))return;x=Math.max(0,Math.min(WW,x));y=Math.max(0,Math.min(WH,y));
   var q=pos[p.peer];if(!q){q=pos[p.peer]={x:x,y:y}}q.x+=(x-q.x)*.25;q.y+=(y-q.y)*.25;seen[p.peer]=1;out.push({x:q.x,y:q.y,av:a,face:pr.f===-1?-1:1,moving:pr.v===1&&Math.hypot(x-q.x,y-q.y)>2})});
  Object.keys(pos).forEach(function(k){if(!seen[k])delete pos[k]});return out}
@@ -626,6 +628,7 @@ function peerList(want){want=want||'h';var out=[],seen={};peers.forEach(function
 function frame(ts){if(!active)return;var dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);draw();sendPresence(false);raf=requestAnimationFrame(frame)}
 window.__worldShow=function(on){if(on){if(active)return;active=true;resize();initRoom();if(!hasSaved&&!labOpen)openLab();last=performance.now();raf=requestAnimationFrame(frame)}
  else{active=false;cancelAnimationFrame(raf);keys={};joy.x=joy.y=0;if(mode!=='hub'){$('wquit').hidden=true;over.hidden=true;paused=false;mode='hub';sample=null;dock=null;P.x=1200;P.y=920}sendPresence(true)}};
-window.__world={get mode(){return mode},get av(){return av},get P(){return P},get sample(){return sample},get dock(){return dock},get paused(){return paused},get peers(){return peerList()},get labOpen(){return labOpen},WW:WW,WH:WH,PADS:PADS,get room(){return room},get lastSeed(){return lastSeed}};
+if(location.hash==='#world')window.__worldShow(true);
+window.__world={get mode(){return mode},get av(){return av},get P(){return P},get sample(){return sample},get dock(){return dock},get paused(){return paused},get peers(){return peerList()},get labOpen(){return labOpen},WW:WW,WH:WH,PADS:PADS,get room(){return room},get lastSeed(){return lastSeed},get gpeers(){return peerList(mode==='sample'?'s':'d')}};
 })();
-</script><script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js" async></script></body></html>
+</script><script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js" async></script></body></html>
