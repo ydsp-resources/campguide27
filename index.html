@@ -728,7 +728,7 @@ st.addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedT
 addEventListener('resize',function(){if(bk.hidden)return;var p=cur;build();cur=list[idx(p)][0];render(0)});
 /* download: a normal link on regular websites; hidden on the Claude-hosted preview, which cannot offer file downloads */
 var onClaude=!!(window.claude&&window.claude.use);
-function pdfBlob(){var s=atob(PDFB64),n=s.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=s.charCodeAt(i);return new Blob([u],{type:'application/pdf'})}
+function pdfBlob(){var s=atob(PDFB64),n=s.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=s.charCodeAt(i);return new Blob([u],{type:'application/octet-stream'})}
 document.querySelectorAll('.bkdl').forEach(function(b){if(onClaude){b.hidden=true;return}b.addEventListener('click',function(e){e.preventDefault();var url=URL.createObjectURL(pdfBlob()),a=document.createElement('a');a.href=url;a.download=PDF;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(url)},6000)})});
 })();
 </script><script>(function(){
