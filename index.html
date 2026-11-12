@@ -668,7 +668,8 @@ function drawDock(d){var W=view$.w,Hh=view$.h,fw=600,fh=800,s=Math.min(W/fw,Hh/f
 var MQ=null,MQID='u'+Math.random().toString(36).slice(2,10),MQB=[{u:'wss://broker.emqx.io:8084/mqtt'},{u:'wss://broker.hivemq.com:8884/mqtt'},{u:'wss://test.mosquitto.org:8081'},{u:'wss://demo.tbmq.io/mqtt',user:'demo'}],mqErr='';
 function mqMsg(t,pl){var s=String(t).split('/');if(s[1]==='_gone'){var id=s[2];Object.keys(MQ.rooms).forEach(function(k){MQ.rooms[k].drop(id)});return}
  var r=MQ.rooms[s[1]];if(r)r.handle(s.slice(2).join('/'),pl)}
-function mqConnect(){if(MQ&&MQ.p)return MQ.p;var st={rooms:{},c:null};MQ=st;var p=new Promise(function(res,rej){
+function ensureMqtt(){return new Promise(function(res){if(window.mqtt){res();return}var t0=Date.now(),inj=false;(function w(){if(window.mqtt){res();return}if(!inj&&Date.now()-t0>2500){inj=true;try{var s=document.createElement('script');s.src='https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js';document.head.appendChild(s)}catch(e){}}if(Date.now()-t0>9000){res();return}setTimeout(w,200)})()})}
+function mqConnect(){if(MQ&&MQ.p)return MQ.p;var st={rooms:{},c:null};MQ=st;var p=ensureMqtt().then(function(){return new Promise(function(res,rej){
  if(!window.mqtt){mqErr='the connection library did not load';rej({code:'service',detail:mqErr});return}
  var left=MQB.length,won=false,cl=[];
  function fin(){left--;if(left<=0&&!won){mqErr='no relay server could be reached';rej({code:'service',detail:mqErr})}}
@@ -682,7 +683,7 @@ function mqConnect(){if(MQ&&MQ.p)return MQ.p;var st={rooms:{},c:null};MQ=st;var 
    if(won){try{c.end(true)}catch(e){}return}
    won=true;cl.forEach(function(x){if(x!==c){try{x.end(true)}catch(e){}}});
    if(c.options)c.options.reconnectPeriod=2500;st.c=c;c.subscribe('ydsp26/_gone/+');c.on('message',mqMsg);
-   c.on('connect',function(){c.subscribe('ydsp26/_gone/+');Object.keys(st.rooms).forEach(function(k){st.rooms[k].resub()})});res(c)})});});
+   c.on('connect',function(){c.subscribe('ydsp26/_gone/+');Object.keys(st.rooms).forEach(function(k){st.rooms[k].resub()})});res(c)})});});});
  st.p=p;p.catch(function(){if(MQ===st)MQ=null});return p}
 function p2pLobby(){return{p2p:true,presence:function(){return Promise.resolve()},join:mqttJoin}}
 function mqttJoin(name){return mqConnect().then(function(c){if(MQ.rooms[name])return MQ.rooms[name].api;return new Promise(function(resolve){
@@ -710,16 +711,17 @@ var net=$('wnet');net.style.cursor='pointer';net.addEventListener('click',functi
 function attach(r){if(unsub){try{unsub()}catch(e){}unsub=null}peers=[];pos={};room=r;unsub=r.onPeers(function(ch){peers=ch.peers||[];netUpdate()},function(){});netUpdate();sendPresence(true)}
 function initRoom(){if(base!==null&&!mqFail)return;mqFail=false;base=false;if(!window.claude||!window.claude.use){joinEveryone();return}
  try{window.claude.use('room').then(function(r){if(!r)return;base=r;attach(r)}).catch(function(){})}catch(e){}}
-var liveTry=0;function joinEveryone(){liveTry++;netUpdate();try{mqttJoin('everyone').then(function(r){base=r;attach(r);netUpdate()}).catch(function(){base=false;mqFail=true;netUpdate()})}catch(e){base=false;mqFail=true;netUpdate()}}var mqFail=false;
+var liveTry=0;var joinP=null;function failMsg(){return'Could not reach the live service, so you are playing solo'+(mqErr?' ('+mqErr+')':'')+'. Your network may be blocking it. Try mobile data or another Wi-Fi, then tap Solo at the top right to try again.'}
+function joinEveryone(){liveTry++;netUpdate();try{joinP=mqttJoin('everyone').then(function(r){base=r;attach(r);netUpdate()}).catch(function(){base=false;mqFail=true;netUpdate()})}catch(e){base=false;mqFail=true;netUpdate();joinP=null}}var mqFail=false;
 function netw(){try{$('wstage').style.setProperty('--netw',Math.ceil(net.getBoundingClientRect().width)+'px')}catch(e){}}
 function netUpdate(){netUpdate0();netw()}
 function netUpdate0(){if(!room){net.textContent=(window.claude&&window.claude.use)||!base&&!mqFail&&liveTry?(liveTry&&!mqFail?'Connecting...':'Solo'):'Solo';net.className='wpill';return}var n=0;peers.forEach(function(p){if(p.kind==='viewer'&&!p.isMe)n++});net.textContent=(rcode?'Friends '+rcode.toUpperCase():(room&&room.mq?'Everyone':'Live'))+' \u00b7 '+(n+1);net.innerHTML=net.textContent+'<span class="on"> online</span>';net.className='wpill live'}
 /* play with friends: private room by code */
 var fr=$('wfr'),fm=$('wfmsg'),fi=$('wfcode');
 function frMsg(t){fm.textContent=t||''}window.__p2pStatus=frMsg;
-function frOpen(){if(mode!=='hub'||labOpen)return;$('wguide').hidden=true;fr.hidden=false;fi.value=rcode.toUpperCase();frMsg(base?(rcode?'You are in room '+rcode.toUpperCase()+'.':''):(mqFail?'Could not reach the live service, so you are playing solo. Your network may be blocking it. Try mobile data or another Wi-Fi, then tap the \"Solo\" label at the top right to try again.':'Connecting to the live service... try again in a moment.'));if(base)fi.focus()}
+function frOpen(){if(mode!=='hub'||labOpen)return;$('wguide').hidden=true;fr.hidden=false;fi.value=rcode.toUpperCase();frMsg(base?(rcode?'You are in room '+rcode.toUpperCase()+'.':''):(mqFail?failMsg():'Connecting to the live service. Joining a room will work in a moment.'));if(base)fi.focus()}
 function frClose(){fr.hidden=true;fi.blur()}
-function frJoin(){var c=(fi.value||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(!base){frMsg('Friend rooms are not available on this link.');return}if(c.length<3||c.length>8){frMsg('Use a code of 3 to 8 letters or numbers.');return}
+function frJoin(){var c=(fi.value||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(!base){if(mqFail){frMsg(failMsg());return}if(joinP){frMsg('Connecting to the live service... please wait a moment.');joinP.then(function(){if(base)frJoin();else frMsg(failMsg())});return}frMsg('Friend rooms are not available on this link.');return}if(c.length<3||c.length>8){frMsg('Use a code of 3 to 8 letters or numbers.');return}
  window.__p2pStatus=frMsg;frMsg('Connecting... this can take up to 25 seconds.');base.join('friends-'+c).then(function(nr){var old=named;if(old&&old!==nr){try{old.leave()}catch(e){}}
   if(!rcode){try{base.presence({x:null,y:null,a:null,m:null,f:null,v:null}).catch(function(){})}catch(e){}}
   named=nr;rcode=c;attach(nr);fi.value=c.toUpperCase();frMsg('Joined room '+c.toUpperCase()+'. Friends who type the same code will appear here.');setTimeout(function(){if(rcode===c)frClose()},1600)}).catch(function(e){frMsg(e&&e.code==='not_permitted'?'Private rooms are not available for your account here.':(e&&e.code==='service'?'Could not reach the matchmaking service. Your network or browser may be blocking it. Try mobile data or another Wi-Fi. ['+(e.detail||'')+']':(e&&e.code==='direct'?'Found the room, but your two devices could not connect to each other. This often happens when they are on different networks (for example one on mobile data) or on a school or office network. Try both devices on the same Wi-Fi. ['+(e.detail||'')+']':'Could not join. Please try again. ['+((e&&(e.detail||e.code))||'')+']')))})}
