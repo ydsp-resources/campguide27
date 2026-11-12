@@ -326,6 +326,7 @@ body.touch #whelp{display:none}
 .pbreak b{color:#8C3A00}
 .pnote{margin-top:1rem;color:#C9D6F0;font-size:17px}
 
+#wnet{pointer-events:auto}
 #wguide[hidden]{display:none}#wguide{position:absolute;z-index:9;left:50%;top:50%;transform:translate(-50%,-50%);width:min(94%,640px);max-height:94%;overflow:auto;padding:20px 24px}
 #wguide h2{font-family:Tektur,sans-serif;font-weight:500;font-size:24px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
 #wguide h3{font-family:Outfit,sans-serif;font-weight:700;font-size:19px;color:#0A38A5;margin:16px 0 4px}
@@ -370,7 +371,7 @@ body.touch #whelp{display:none}
 <div id="wlab" class="hud" hidden><h2>Avatar Lab</h2><div class="sub">Customise your avatar. Others in the world will see it.</div><div class="labgrid"><canvas id="wprev" width="300" height="340"></canvas><div id="wlabrows"></div></div><div class="wbtns"><button class="wb" id="wsave" type="button">Save &amp; explore</button></div></div>
 <div id="wcount" hidden></div><button id="wquit" type="button" hidden>&#10005; Quit game</button><div id="wguide" class="hud" hidden role="dialog" aria-label="How to play"><h2>How to play</h2>
 <h3>Move around</h3><p><span class="kc">W A S D</span> or the <span class="kc">Arrow keys</span> to walk. Hold <span class="kc">Shift</span> to boost. On a phone, use the pad at the bottom left to walk and the Boost button at the bottom right.</p>
-<h3>Buttons at the top</h3><ul><li><b>Contents</b>: go back to the guide.</li><li><b>Help</b>: open these instructions again.</li><li><b>Friends</b>: make or enter a room code to play in a private room with your friends.</li><li><b>Avatar</b>: change how your astronaut looks and pick a nickname. Please do not use your real name.</li></ul>
+<h3>Buttons at the top</h3><ul><li><b>Contents</b>: go back to the guide.</li><li><b>Help</b>: open these instructions again.</li><li><b>Friends</b>: make or enter a room code to play in a private room with your friends.</li><li><b>Avatar</b>: change how your robot looks and pick a nickname. Please do not use your real name.</li></ul>
 <h3>Play the games</h3><p>Walk onto one of the two glowing circles: <b>Sample Run</b> or <b>Docking Run</b>. A prompt appears at the bottom of the screen. Press <span class="kc">E</span> or click or tap the prompt to start. To leave a game early, press <b>Quit game</b> or <span class="kc">Esc</span>.</p>
 <h3>Play together</h3><ol><li>Everyone who wants to play together must stand on the <b>same circle</b> at the same time.</li><li>One person presses play. A 3-second countdown starts for everyone on that circle.</li><li>Everyone plays the same course and can see each other. Anyone who is not on the circle when the countdown starts is not part of that round.</li></ol>
 <h3>Play with friends using a room code</h3><ol><li>Tap <b>Friends</b>, then press <b>Make a code</b>.</li><li>Send the code to your friends.</li><li>Each friend taps Friends, types the same code and presses <b>Join room</b>.</li><li>Now only your group is in the room. Stand on a circle together to start a game.</li></ol><p>Press <b>Back to everyone</b> to return to the shared world.</p>
@@ -664,17 +665,24 @@ function drawDock(d){var W=view$.w,Hh=view$.h,fw=600,fh=800,s=Math.min(W/fw,Hh/f
  if(k.msgT>0){ctx.fillStyle='rgba(255,255,255,'+Math.min(1,k.msgT*2)+')';ctx.font='bold 26px Tektur,sans-serif';ctx.textAlign='center';ctx.fillText(k.msg,fw/2,200-(.7-k.msgT)*40)}}
 /* ---------- multiplayer (live presence, optional) ---------- */
 /* ---------- shared world over a public relay (MQTT over WebSocket). Used when the page is NOT on Claude. ---------- */
-var MQ=null,MQID='u'+Math.random().toString(36).slice(2,10),MQB=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081'],mqErr='';
+var MQ=null,MQID='u'+Math.random().toString(36).slice(2,10),MQB=[{u:'wss://broker.emqx.io:8084/mqtt'},{u:'wss://broker.hivemq.com:8884/mqtt'},{u:'wss://test.mosquitto.org:8081'},{u:'wss://demo.tbmq.io/mqtt',user:'demo'}],mqErr='';
 function mqMsg(t,pl){var s=String(t).split('/');if(s[1]==='_gone'){var id=s[2];Object.keys(MQ.rooms).forEach(function(k){MQ.rooms[k].drop(id)});return}
  var r=MQ.rooms[s[1]];if(r)r.handle(s.slice(2).join('/'),pl)}
 function mqConnect(){if(MQ&&MQ.p)return MQ.p;var st={rooms:{},c:null};MQ=st;var p=new Promise(function(res,rej){
  if(!window.mqtt){mqErr='the connection library did not load';rej({code:'service',detail:mqErr});return}
- var i=0;(function next(){if(i>=MQB.length){mqErr='no relay server could be reached';rej({code:'service',detail:mqErr});return}
-  var url=MQB[i++],done=false,c;try{c=window.mqtt.connect(url,{clientId:'ydsp26-'+MQID+'-'+Math.random().toString(36).slice(2,6),clean:true,reconnectPeriod:2500,connectTimeout:7000,keepalive:30,will:{topic:'ydsp26/_gone/'+MQID,payload:'1',qos:0}})}catch(e){next();return}
-  var to=setTimeout(function(){if(!done){done=true;try{c.end(true)}catch(e){}next()}},8500);
+ var left=MQB.length,won=false,cl=[];
+ function fin(){left--;if(left<=0&&!won){mqErr='no relay server could be reached';rej({code:'service',detail:mqErr})}}
+ MQB.forEach(function(b){var c,done=false,to;
+  try{var o={clientId:'ydsp26-'+MQID+'-'+Math.random().toString(36).slice(2,6),clean:true,reconnectPeriod:0,connectTimeout:9000,keepalive:30,will:{topic:'ydsp26/_gone/'+MQID,payload:'1',qos:0}};if(b.user)o.username=b.user;c=window.mqtt.connect(b.u,o)}catch(e){fin();return}
+  cl.push(c);
+  to=setTimeout(function(){if(!done&&!won){done=true;try{c.end(true)}catch(e){}fin()}},10500);
   c.on('error',function(){});
-  c.once('connect',function(){if(done)return;done=true;clearTimeout(to);st.c=c;c.subscribe('ydsp26/_gone/+');c.on('message',mqMsg);
-   c.on('connect',function(){c.subscribe('ydsp26/_gone/+');Object.keys(st.rooms).forEach(function(k){st.rooms[k].resub()})});res(c)})})()});
+  c.once('close',function(){if(!done&&!won){done=true;clearTimeout(to);fin()}});
+  c.once('connect',function(){if(done)return;done=true;clearTimeout(to);
+   if(won){try{c.end(true)}catch(e){}return}
+   won=true;cl.forEach(function(x){if(x!==c){try{x.end(true)}catch(e){}}});
+   if(c.options)c.options.reconnectPeriod=2500;st.c=c;c.subscribe('ydsp26/_gone/+');c.on('message',mqMsg);
+   c.on('connect',function(){c.subscribe('ydsp26/_gone/+');Object.keys(st.rooms).forEach(function(k){st.rooms[k].resub()})});res(c)})});});
  st.p=p;p.catch(function(){if(MQ===st)MQ=null});return p}
 function p2pLobby(){return{p2p:true,presence:function(){return Promise.resolve()},join:mqttJoin}}
 function mqttJoin(name){return mqConnect().then(function(c){if(MQ.rooms[name])return MQ.rooms[name].api;return new Promise(function(resolve){
@@ -698,7 +706,7 @@ function mqttJoin(name){return mqConnect().then(function(c){if(MQ.rooms[name])re
  c.subscribe(T+'#',function(){});pub('hello/'+self,{});flush();resolve(api)})})}
 addEventListener('pagehide',function(){try{if(MQ&&MQ.c)Object.keys(MQ.rooms).forEach(function(k){MQ.rooms[k].api.leave()})}catch(e){}});
 var room=null,base=null,named=null,rcode='',unsub=null,peers=[],pos={},sentAt=0,lastSent='';
-var net=$('wnet');
+var net=$('wnet');net.style.cursor='pointer';net.addEventListener('click',function(){if(mqFail&&!window.claude)initRoom()});
 function attach(r){if(unsub){try{unsub()}catch(e){}unsub=null}peers=[];pos={};room=r;unsub=r.onPeers(function(ch){peers=ch.peers||[];netUpdate()},function(){});netUpdate();sendPresence(true)}
 function initRoom(){if(base!==null&&!mqFail)return;mqFail=false;base=false;if(!window.claude||!window.claude.use){joinEveryone();return}
  try{window.claude.use('room').then(function(r){if(!r)return;base=r;attach(r)}).catch(function(){})}catch(e){}}
@@ -709,7 +717,7 @@ function netUpdate0(){if(!room){net.textContent=(window.claude&&window.claude.us
 /* play with friends: private room by code */
 var fr=$('wfr'),fm=$('wfmsg'),fi=$('wfcode');
 function frMsg(t){fm.textContent=t||''}window.__p2pStatus=frMsg;
-function frOpen(){if(mode!=='hub'||labOpen)return;$('wguide').hidden=true;fr.hidden=false;fi.value=rcode.toUpperCase();frMsg(base?(rcode?'You are in room '+rcode.toUpperCase()+'.':''):(mqFail?'Could not reach the live service, so you are playing solo. Your network may be blocking it; try mobile data or another Wi-Fi, then reload.':'Connecting to the live service... try again in a moment.'));if(base)fi.focus()}
+function frOpen(){if(mode!=='hub'||labOpen)return;$('wguide').hidden=true;fr.hidden=false;fi.value=rcode.toUpperCase();frMsg(base?(rcode?'You are in room '+rcode.toUpperCase()+'.':''):(mqFail?'Could not reach the live service, so you are playing solo. Your network may be blocking it. Try mobile data or another Wi-Fi, then tap the \"Solo\" label at the top right to try again.':'Connecting to the live service... try again in a moment.'));if(base)fi.focus()}
 function frClose(){fr.hidden=true;fi.blur()}
 function frJoin(){var c=(fi.value||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(!base){frMsg('Friend rooms are not available on this link.');return}if(c.length<3||c.length>8){frMsg('Use a code of 3 to 8 letters or numbers.');return}
  window.__p2pStatus=frMsg;frMsg('Connecting... this can take up to 25 seconds.');base.join('friends-'+c).then(function(nr){var old=named;if(old&&old!==nr){try{old.leave()}catch(e){}}
